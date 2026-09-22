@@ -1,27 +1,30 @@
-import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
-  const [page, setPage] = useState("home");
-
   return (
-    <>
-      <nav>
-        <button onClick={() => setPage("home")}>Tere</button>
-        <button onClick={() => setPage("second")}>Teine leht</button>
-      </nav>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path=""
+          element={
+            <div>
+              <h1>Tere</h1>
+              <p>See on avaleht.</p>
+            </div>
+          }
+        />
 
-      {page === "home" ? (
-        <>
-          <h1>Tere/raamistik 666</h1>
-          <p>See on meie esimene Reacti rakendus.</p>
-        </>
-      ) : (
-        <>
-          <h1>Teine leht</h1>
-          <p>See on meie rakenduse teine lehekülg.</p>
-        </>
-      )}
-    </>
+        <Route
+          path="/raamistik"
+          element={
+            <div>
+              <h1>Meie raamistik666</h1>
+              <p>See on teine lehekülg.</p>
+            </div>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
