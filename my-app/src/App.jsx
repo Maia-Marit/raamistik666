@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Meist from "./pages/Meist.jsx";
 
 function App() {
   const [page, setPage] = useState("home");
@@ -16,13 +17,11 @@ function App() {
           <p>See on meie esimene Reacti rakendus.</p>
         </>
       ) : (
-        <>
-          <h1>Teine leht</h1>
-          <p>See on meie rakenduse teine lehekülg.</p>
-        </>
+        <Meist />
       )}
     </>
   );
 }
 
 export default App;
+
