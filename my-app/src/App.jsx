@@ -22,7 +22,7 @@ function About() {
   return (
     <div style={pageStyle}>
       <h2>Meie</h2>
-      <p>Klikki, et näha kes on selle loojad</p>
+      <p>Klikki, et näha kes on selle Äppi loojad</p>
 
       {/* Nupp nimede kuvamiseks või peitmiseks */}
       <button onClick={() => setNaitaSid(!naitaSid)} style={buttonStyle}>
