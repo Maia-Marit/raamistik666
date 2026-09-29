@@ -16,35 +16,24 @@ function Home() {
   const [nimi, setNimi] = useState("");
   const [vanus, setVanus] = useState("");
 
+function lisaUusInimene() {
+  console.log("LISA NUPPU VAJUTATI");
 
+  const uusInimene = {
+    nimi: nimi,
+    vanus: Number(vanus),
+  };
 
-  // Lisame uue inimese
-  function lisaUusInimene() {
-    const uusInimene = {
-      nimi: nimi,
-      vanus: Number(vanus),
-    };
+  const uuedInimesed = [...inimesed, uusInimene];
 
-    const uuedInimesed = [...inimesed, uusInimene];
+  setInimesed(uuedInimesed);
 
-    // Saadame uue nimekirja serverile
-    fetch("http://localhost:3001/api/inimesed", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(uuedInimesed),
-    })
-      .then((response) => response.json())
-      .then(() => {
-        setInimesed(uuedInimesed);
+  setNimi("");
+  setVanus("");
+  setLisaInimene(false);
+}
 
-        setNimi("");
-        setVanus("");
-        setLisaInimene(false);
-      });
-  }
-
+ 
   return (
     <div style={pageStyle}>
       <h2>Avaleht</h2>
