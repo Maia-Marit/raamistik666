@@ -1,22 +1,98 @@
-import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
-// 1. Esimene leht: Avaleht (Nüüd on siin lihtsalt puhas tekst)
+import { useState, useEffect } from "react";
+import algsedInimesed from "./inimesed.json";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+} from "react-router-dom";
+
+// 1. Esimene leht: Avaleht
 function Home() {
+  const [inimesed, setInimesed] = useState(algsedInimesed);
+  const [lisaInimene, setLisaInimene] = useState(false);
+
+  const [nimi, setNimi] = useState("");
+  const [vanus, setVanus] = useState("");
+
+
+
+  // Lisame uue inimese
+  function lisaUusInimene() {
+    const uusInimene = {
+      nimi: nimi,
+      vanus: Number(vanus),
+    };
+
+    const uuedInimesed = [...inimesed, uusInimene];
+
+    // Saadame uue nimekirja serverile
+    fetch("http://localhost:3001/api/inimesed", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(uuedInimesed),
+    })
+      .then((response) => response.json())
+      .then(() => {
+        setInimesed(uuedInimesed);
+
+        setNimi("");
+        setVanus("");
+        setLisaInimene(false);
+      });
+  }
+
   return (
     <div style={pageStyle}>
       <h2>Avaleht</h2>
-      <p>Tere tulemast minu kahelehelise Reacti rakenduse avalehele!</p>
+
+      <h3>Inimesed</h3>
+
+      {inimesed.map((inimene, indeks) => (
+        <p key={indeks}>
+          {inimene.nimi} - {inimene.vanus} aastat
+        </p>
+      ))}
+
+      <button
+        onClick={() => setLisaInimene(!lisaInimene)}
+        style={buttonStyle}
+      >
+        {lisaInimene ? "Sulge" : "Lisa inimene"}
+      </button>
+
+      {lisaInimene && (
+        <div style={{ marginTop: "20px" }}>
+          <input
+            type="text"
+            placeholder="Nimi"
+            value={nimi}
+            onChange={(e) => setNimi(e.target.value)}
+          />
+
+          <input
+            type="number"
+            placeholder="Vanus"
+            value={vanus}
+            onChange={(e) => setVanus(e.target.value)}
+          />
+
+          <button onClick={lisaUusInimene} style={buttonStyle}>
+            Lisa
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-// 2. Teine leht: Meist (Siia kuva-nupp ja nimed üksteise kõrval)
+// 2. Teine leht: Meist
 function About() {
-  // Olek, mis määrab, kas nimed on nähtavad või mitte
   const [naitaSid, setNaitaSid] = useState(false);
 
-  // Kolm nime, mida kuvada
   const nimed = ["Maia-Marit", "Eneli", "Birgit"];
 
   return (
@@ -24,12 +100,13 @@ function About() {
       <h2>Meie</h2>
       <p>Klikki, et näha kes on selle Äppi loojad</p>
 
-      {/* Nupp nimede kuvamiseks või peitmiseks */}
-      <button onClick={() => setNaitaSid(!naitaSid)} style={buttonStyle}>
+      <button
+        onClick={() => setNaitaSid(!naitaSid)}
+        style={buttonStyle}
+      >
         {naitaSid ? "Peida nimed" : "Kuva"}
       </button>
 
-      {/* Kui naitaSid on true, kuvatakse nimed üksteise kõrval */}
       {naitaSid && (
         <div style={namesContainerStyle}>
           {nimed.map((nimi, indeks) => (
@@ -48,17 +125,16 @@ export default function App() {
   return (
     <Router>
       <div style={appContainerStyle}>
-        {/* Navigatsioonimenüü */}
         <nav style={navStyle}>
           <Link to="/" style={linkStyle}>
             Avaleht
           </Link>
+
           <Link to="/meist" style={linkStyle}>
             Meist
           </Link>
         </nav>
 
-        {/* Lehtede sisu */}
         <main style={contentStyle}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -71,6 +147,7 @@ export default function App() {
 }
 
 // --- Stiilid ---
+
 const appContainerStyle = {
   fontFamily: "Arial, sans-serif",
   maxWidth: "800px",
@@ -112,19 +189,17 @@ const buttonStyle = {
   cursor: "pointer",
   fontSize: "16px",
   marginTop: "10px",
-  display: "block", // Paneb nupu omaette reale
+  display: "block",
 };
 
-// UUS: Konteiner, mis paneb nimed ritta (Flexbox) ja lisab vahed
 const namesContainerStyle = {
   display: "flex",
   flexDirection: "row",
   gap: "15px",
   marginTop: "20px",
-  flexWrap: "wrap", // Kui ekraan on kitsas, hüppavad nimed järgmisele reale
+  flexWrap: "wrap",
 };
 
-// UUS: Üksiku nime kujundus
 const nameItemStyle = {
   backgroundColor: "#e2e8f0",
   padding: "8px 15px",

@@ -8,14 +8,14 @@ app.use(express.json());
 
 // Loe andmed failist
 app.get('/api/inimesed', (req, res) => {
-  const data = fs.readFileSync('./src/inimesed.json', 'utf8');
+  const data = fs.readFileSync('./inimesed.json', 'utf8');
   res.json(JSON.parse(data));
 });
 
 // Salvesta uued andmed faili
 app.post('/api/inimesed', (req, res) => {
   const uuedInimesed = req.body;
-  fs.writeFileSync('./src/inimesed.json', JSON.stringify(uuedInimesed, null, 2));
+  fs.writeFileSync('./inimesed.json', JSON.stringify(uuedInimesed, null, 2));
   res.json({ success: true });
 });
 
