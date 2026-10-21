@@ -1,14 +1,22 @@
+
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+} from "react-router-dom";
+
+import CourseCard from "./coursecard";
+import CourseManager from "./coursemanager";
 
 // API aadress
 const API_URL = "http://192.168.42.160:3003/people";
 
 // ------------------------------------
-// 1. AVALEHT (Kuhu on lisatud tahvli nupu loogika)
+// 1. AVALEHT
 // ------------------------------------
 function Home() {
-  // Nupu olekud: 'algus', 'laadimine', 'edu', 'viga'
   const [olek, setOlek] = useState("algus");
 
   const käivitaProtsess = () => {
@@ -16,7 +24,6 @@ function Home() {
 
     // Simuleerime 2 sekundit laadimist
     setTimeout(() => {
-      // 50% võimalus, et läheb õigesse kohta (edu) või viskab vea (error 200)
       const onEdukas = Math.random() > 0.5;
 
       if (onEdukas) {
@@ -24,8 +31,7 @@ function Home() {
       } else {
         setOlek("viga");
 
-        // Joonisel viib viga tagasi algusesse.
-        // Suuname automaatselt 2.5 sekundi pärast algasendisse tagasi.
+        // Vea korral tagasi algusesse 2,5 sekundi pärast
         setTimeout(() => {
           setOlek("algus");
         }, 2500);
@@ -37,11 +43,34 @@ function Home() {
     <div style={pageStyle}>
       <h2>Avaleht</h2>
       <p>Tere tulemast minu Reacti rakendusse!</p>
-      <p>Rakendus kasutab inimeste andmete haldamiseks API-t.</p>
+      <p>
+        Rakendus kasutab inimeste andmete haldamiseks API-t.
+      </p>
 
-      {/* ------------------------------------
-          TAHVLI NUPU INTERAKTIIVNE SKEEM
-      ------------------------------------ */}
+      {/* Olemasolevad kursusekaardid */}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "20px",
+          marginTop: "25px",
+          marginBottom: "30px",
+        }}
+      >
+       
+        <CourseCard
+          image="https://i.pinimg.com/736x/0e/ee/9b/0eee9bfaf9217cacbc7aa387b6f07bb9.jpg"
+          title="Kassimaania 1. kursus"
+          description="Õpi kasside kohta rohkem siit, nende käitumisest kuni maailma vallutamiseni."
+        />
+      </div>
+
+      {/* Kursuste lisamine, muutmine ja kustutamine */}
+      <section style={{ marginTop: "30px" }}>
+        <CourseManager />
+      </section>
+
+      {/* Tahvli nupu simulatsioon */}
       <div
         style={{
           marginTop: "40px",
@@ -56,7 +85,10 @@ function Home() {
         {olek === "algus" && (
           <div>
             <p>Vajuta nuppu, et alustada protsessi:</p>
-            <button onClick={käivitaProtsess} style={buttonStyle}>
+            <button
+              onClick={käivitaProtsess}
+              style={buttonStyle}
+            >
               Nupp (Alusta)
             </button>
           </div>
@@ -65,7 +97,11 @@ function Home() {
         {olek === "laadimine" && (
           <div>
             <p
-              style={{ fontSize: "20px", fontWeight: "bold", color: "#ffa500" }}
+              style={{
+                fontSize: "20px",
+                fontWeight: "bold",
+                color: "#ffa500",
+              }}
             >
               🔄 Laadimine... palun oota...
             </p>
@@ -74,9 +110,14 @@ function Home() {
 
         {olek === "edu" && (
           <div style={{ color: "green" }}>
-            <p style={{ fontSize: "24px" }}>✓ Õige koht saavutatud!</p>
+            <p style={{ fontSize: "24px" }}>
+              ✓ Õige koht saavutatud!
+            </p>
             <p>Edukas ühendus.</p>
-            <button onClick={() => setOlek("algus")} style={smallButtonStyle}>
+            <button
+              onClick={() => setOlek("algus")}
+              style={smallButtonStyle}
+            >
               Alusta uuesti
             </button>
           </div>
@@ -84,9 +125,14 @@ function Home() {
 
         {olek === "viga" && (
           <div style={{ color: "red" }}>
-            <p style={{ fontSize: "24px" }}>⚠️ Error 200 - Ei tööta!</p>
+            <p style={{ fontSize: "24px" }}>
+              ⚠️ Error 200 - Ei tööta!
+            </p>
             <p>Suunan automaatselt tagasi algusesse...</p>
-            <button onClick={() => setOlek("algus")} style={deleteButtonStyle}>
+            <button
+              onClick={() => setOlek("algus")}
+              style={deleteButtonStyle}
+            >
               Mine kohe tagasi
             </button>
           </div>
@@ -109,10 +155,18 @@ function About() {
   async function laeInimesed() {
     try {
       const response = await fetch(API_URL);
+
+      if (!response.ok) {
+        throw new Error("Inimeste laadimine ebaõnnestus");
+      }
+
       const andmed = await response.json();
       setInimesed(andmed);
     } catch (error) {
-      console.error("Inimeste laadimine ebaõnnestus:", error);
+      console.error(
+        "Inimeste laadimine ebaõnnestus:",
+        error
+      );
     }
   }
 
@@ -121,21 +175,28 @@ function About() {
   }, []);
 
   async function lisaInimene() {
-    if (nimi === "" || vanus === "") {
+    if (nimi.trim() === "" || vanus === "") {
       alert("Palun täida mõlemad väljad!");
       return;
     }
 
-    const uusInimene = { nimi: nimi, vanus: Number(vanus) };
+    const uusInimene = {
+      nimi: nimi.trim(),
+      vanus: Number(vanus),
+    };
 
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(uusInimene),
       });
 
-      if (!response.ok) throw new Error("Inimese lisamine ebaõnnestus");
+      if (!response.ok) {
+        throw new Error("Inimese lisamine ebaõnnestus");
+      }
 
       await laeInimesed();
       setNimi("");
@@ -148,8 +209,14 @@ function About() {
 
   async function kustutaInimene(id) {
     try {
-      const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error("Kustutamine ebaõnnestus");
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Kustutamine ebaõnnestus");
+      }
+
       await laeInimesed();
     } catch (error) {
       console.error(error);
@@ -157,33 +224,44 @@ function About() {
   }
 
   async function muudaPUT() {
-    if (nimi === "" || vanus === "") {
+    if (nimi.trim() === "" || vanus === "") {
       alert("Palun täida mõlemad väljad!");
       return;
     }
 
-    const muudetudInimene = { nimi: nimi, vanus: Number(vanus) };
+    const muudetudInimene = {
+      nimi: nimi.trim(),
+      vanus: Number(vanus),
+    };
 
     try {
-      const response = await fetch(`${API_URL}/${muudetavInimene.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(muudetudInimene),
-      });
+      const response = await fetch(
+        `${API_URL}/${muudetavInimene.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(muudetudInimene),
+        }
+      );
 
-      if (!response.ok) throw new Error("PUT muutmine ebaõnnestus");
+      if (!response.ok) {
+        throw new Error("PUT muutmine ebaõnnestus");
+      }
 
       await laeInimesed();
       setMuudetavInimene(null);
       setNimi("");
       setVanus("");
+      setNaitaVormi(false);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async function muudaPATCH(id) {
-    if (nimi === "") {
+  async function muudaPATCH(id, uusNimi) {
+    if (uusNimi.trim() === "") {
       alert("Sisesta uus nimi!");
       return;
     }
@@ -191,14 +269,19 @@ function About() {
     try {
       const response = await fetch(`${API_URL}/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nimi: nimi }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nimi: uusNimi.trim(),
+        }),
       });
 
-      if (!response.ok) throw new Error("PATCH muutmine ebaõnnestus");
+      if (!response.ok) {
+        throw new Error("PATCH muutmine ebaõnnestus");
+      }
 
       await laeInimesed();
-      setNimi("");
     } catch (error) {
       console.error(error);
     }
@@ -221,6 +304,7 @@ function About() {
           <div key={inimene.id} style={personCardStyle}>
             <strong>{inimene.nimi}</strong>
             <span>{inimene.vanus} aastat</span>
+
             <div style={personButtonsStyle}>
               <button
                 onClick={() => alustaMuutmist(inimene)}
@@ -228,20 +312,23 @@ function About() {
               >
                 Muuda
               </button>
+
               <button
                 onClick={() => kustutaInimene(inimene.id)}
                 style={deleteButtonStyle}
               >
                 Kustuta
               </button>
+
               <button
                 onClick={() => {
-                  const uusNimi = prompt("Sisesta uus nimi:", inimene.nimi);
-                  if (uusNimi) {
-                    setNimi(uusNimi);
-                    setTimeout(() => {
-                      muudaPATCH(inimene.id);
-                    }, 0);
+                  const uusNimi = prompt(
+                    "Sisesta uus nimi:",
+                    inimene.nimi
+                  );
+
+                  if (uusNimi !== null && uusNimi.trim()) {
+                    muudaPATCH(inimene.id, uusNimi);
                   }
                 }}
                 style={patchButtonStyle}
@@ -256,6 +343,7 @@ function About() {
       <button
         onClick={() => {
           setNaitaVormi(!naitaVormi);
+
           if (muudetavInimene) {
             setMuudetavInimene(null);
             setNimi("");
@@ -269,7 +357,12 @@ function About() {
 
       {naitaVormi && (
         <div style={formStyle}>
-          <h3>{muudetavInimene ? "Muuda inimest" : "Lisa uus inimene"}</h3>
+          <h3>
+            {muudetavInimene
+              ? "Muuda inimest"
+              : "Lisa uus inimene"}
+          </h3>
+
           <input
             type="text"
             placeholder="Nimi"
@@ -277,6 +370,7 @@ function About() {
             onChange={(e) => setNimi(e.target.value)}
             style={inputStyle}
           />
+
           <input
             type="number"
             placeholder="Vanus"
@@ -284,12 +378,19 @@ function About() {
             onChange={(e) => setVanus(e.target.value)}
             style={inputStyle}
           />
+
           {muudetavInimene ? (
-            <button onClick={muudaPUT} style={buttonStyle}>
+            <button
+              onClick={muudaPUT}
+              style={buttonStyle}
+            >
               Salvesta PUT
             </button>
           ) : (
-            <button onClick={lisaInimene} style={buttonStyle}>
+            <button
+              onClick={lisaInimene}
+              style={buttonStyle}
+            >
               Lisa POST
             </button>
           )}
@@ -300,7 +401,7 @@ function About() {
 }
 
 // ------------------------------------
-// 3. PEAMINE APP (Koodi lõpud ja sulgemised lisatud)
+// 3. PEAMINE APP
 // ------------------------------------
 export default function App() {
   return (
@@ -310,6 +411,7 @@ export default function App() {
           <Link to="/" style={linkStyle}>
             Avaleht
           </Link>
+
           <Link to="/meist" style={linkStyle}>
             Meist
           </Link>
@@ -326,12 +428,35 @@ export default function App() {
   );
 }
 
-// STILISEERIMISE NÄIDISED (Et kood jookseks vigadeta kokku)
-const appContainerStyle = { fontFamily: "Arial, sans-serif", padding: "20px" };
-const navStyle = { display: "flex", gap: "15px", marginBottom: "20px" };
-const linkStyle = { textDecoration: "none", color: "blue", fontWeight: "bold" };
-const contentStyle = { padding: "10px" };
-const pageStyle = { maxWidth: "600px", margin: "0 auto" };
+// ------------------------------------
+// 4. STIILID
+// ------------------------------------
+const appContainerStyle = {
+  fontFamily: "Arial, sans-serif",
+  padding: "20px",
+};
+
+const navStyle = {
+  display: "flex",
+  gap: "15px",
+  marginBottom: "20px",
+};
+
+const linkStyle = {
+  textDecoration: "none",
+  color: "blue",
+  fontWeight: "bold",
+};
+
+const contentStyle = {
+  padding: "10px",
+};
+
+const pageStyle = {
+  maxWidth: "900px",
+  margin: "0 auto",
+};
+
 const buttonStyle = {
   padding: "10px 20px",
   background: "#007bff",
@@ -340,11 +465,13 @@ const buttonStyle = {
   borderRadius: "5px",
   cursor: "pointer",
 };
+
 const smallButtonStyle = {
   padding: "5px 10px",
   margin: "2px",
   cursor: "pointer",
 };
+
 const deleteButtonStyle = {
   padding: "5px 10px",
   margin: "2px",
@@ -353,6 +480,7 @@ const deleteButtonStyle = {
   border: "none",
   cursor: "pointer",
 };
+
 const patchButtonStyle = {
   padding: "5px 10px",
   margin: "2px",
@@ -361,16 +489,19 @@ const patchButtonStyle = {
   border: "none",
   cursor: "pointer",
 };
+
 const addButtonStyle = {
   padding: "10px 20px",
   marginTop: "15px",
   cursor: "pointer",
 };
+
 const namesContainerStyle = {
   display: "flex",
   flexDirection: "column",
   gap: "10px",
 };
+
 const personCardStyle = {
   border: "1px solid #ddd",
   padding: "10px",
@@ -378,8 +509,15 @@ const personCardStyle = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  flexWrap: "wrap",
 };
-const personButtonsStyle = { display: "flex", gap: "5px" };
+
+const personButtonsStyle = {
+  display: "flex",
+  gap: "5px",
+  flexWrap: "wrap",
+};
+
 const formStyle = {
   marginTop: "20px",
   display: "flex",
@@ -387,8 +525,10 @@ const formStyle = {
   gap: "10px",
   maxWidth: "300px",
 };
+
 const inputStyle = {
   padding: "8px",
   borderRadius: "4px",
   border: "1px solid #ccc",
 };
+
