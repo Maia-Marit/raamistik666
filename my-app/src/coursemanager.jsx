@@ -149,19 +149,27 @@ export default function CourseManager() {
       background: "#fee2e2",
       color: "#991b1b",
     },
-    grid: {
-      display: "grid",
-      gridTemplateColumns:
-        "repeat(auto-fit, minmax(260px, 1fr))",
-      gap: "24px",
-    },
-    card: {
-      minWidth: 0,
-      border: "1px solid #e5e7eb",
-      borderRadius: "10px",
-      overflow: "hidden",
-      paddingBottom: "16px",
-    },
+    
+grid: {
+  display: "flex",
+  gap: "24px",
+  overflowX: "auto",
+  overflowY: "hidden",
+  padding: "10px 4px 20px",
+  scrollBehavior: "smooth",
+  WebkitOverflowScrolling: "touch",
+},
+    
+card: {
+  flex: "0 0 280px",
+  width: "280px",
+  boxSizing: "border-box",
+  border: "1px solid #e5e7eb",
+  borderRadius: "10px",
+  overflow: "hidden",
+  paddingBottom: "16px",
+},
+
     actions: {
       display: "flex",
       gap: "8px",
