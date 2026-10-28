@@ -1,21 +1,29 @@
 
+import { useState } from "react";
+
 function CourseCard({ image, title, description }) {
+  const [imageError, setImageError] = useState(false);
+
   return (
-    <div style={styles.card}>
-      <img
-        src={image}
-        alt={title}
-        style={styles.image}
-        onError={(e) => {
-          e.currentTarget.style.display = "none";
-        }}
-      />
+    <article style={styles.card}>
+      {image && !imageError ? (
+        <img
+          src={image}
+          alt={title}
+          style={styles.image}
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <div style={styles.imageFallback}>
+          Pilt pole saadaval
+        </div>
+      )}
 
       <div style={styles.content}>
         <h3 style={styles.title}>{title}</h3>
         <p style={styles.description}>{description}</p>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -33,6 +41,14 @@ const styles = {
     height: "160px",
     objectFit: "cover",
     display: "block",
+  },
+  imageFallback: {
+    minHeight: "160px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f0f0f0",
+    color: "#20211f",
   },
   content: {
     padding: "30px",

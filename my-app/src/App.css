@@ -130,6 +130,12 @@
     &:hover {
       box-shadow: var(--shadow);
     }
+
+    &:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
     .button-icon {
       height: 18px;
       width: 18px;
