@@ -10,19 +10,23 @@ import {
 import CourseCard from "./coursecard";
 import CourseManager from "./coursemanager";
 
+import i18n from "./i18n";
+import { useTranslation } from "react-i18next";
+
 // API aadress
 const API_URL = "http://192.168.42.160:3003/people";
 
 // ------------------------------------
 // 1. AVALEHT
 // ------------------------------------
+
 function Home() {
+  const { t } = useTranslation();
   const [olek, setOlek] = useState("algus");
 
   const käivitaProtsess = () => {
     setOlek("laadimine");
 
-    // Simuleerime 2 sekundit laadimist
     setTimeout(() => {
       const onEdukas = Math.random() > 0.5;
 
@@ -31,7 +35,6 @@ function Home() {
       } else {
         setOlek("viga");
 
-        // Vea korral tagasi algusesse 2,5 sekundi pärast
         setTimeout(() => {
           setOlek("algus");
         }, 2500);
@@ -41,13 +44,11 @@ function Home() {
 
   return (
     <div style={pageStyle}>
-      <h2>Avaleht</h2>
-      <p>Tere tulemast minu Reacti rakendusse!</p>
-      <p>
-        Rakendus kasutab inimeste andmete haldamiseks API-t.
-      </p>
+      <h2>{t("home")}</h2>
+      <p>{t("welcome")}</p>
+      <p>{t("apiInfo")}</p>
 
-      {/* Olemasolevad kursusekaardid */}
+      {/* Kursusekaart */}
       <div
         style={{
           display: "flex",
@@ -57,18 +58,14 @@ function Home() {
           marginBottom: "30px",
         }}
       >
-       
         <CourseCard
           image="https://i.pinimg.com/736x/0e/ee/9b/0eee9bfaf9217cacbc7aa387b6f07bb9.jpg"
-          title="Kassimaania 1. kursus"
-          description="Õpi kasside kohta rohkem siit, nende käitumisest kuni maailma vallutamiseni."
+          title={t("courseTitle")}
+          description={t("courseDescription")}
         />
       </div>
 
-      {/* Kursuste lisamine, muutmine ja kustutamine */}
-      <section style={{ marginTop: "30px" }}>
-        <CourseManager />
-      </section>
+      <CourseManager />
 
       {/* Tahvli nupu simulatsioon */}
       <div
@@ -80,45 +77,43 @@ function Home() {
           textAlign: "center",
         }}
       >
-        <h3>Tahvli nupu simulatsioon</h3>
+        <h3>{t("simulation")}</h3>
 
         {olek === "algus" && (
           <div>
-            <p>Vajuta nuppu, et alustada protsessi:</p>
+            <p>{t("pressToStart")}</p>
             <button
               onClick={käivitaProtsess}
               style={buttonStyle}
             >
-              Nupp (Alusta)
+              {t("start")}
             </button>
           </div>
         )}
 
         {olek === "laadimine" && (
-          <div>
-            <p
-              style={{
-                fontSize: "20px",
-                fontWeight: "bold",
-                color: "#ffa500",
-              }}
-            >
-              🔄 Laadimine... palun oota...
-            </p>
-          </div>
+          <p
+            style={{
+              fontSize: "20px",
+              fontWeight: "bold",
+              color: "#ffa500",
+            }}
+          >
+            🔄 {t("loading")}
+          </p>
         )}
 
         {olek === "edu" && (
           <div style={{ color: "green" }}>
             <p style={{ fontSize: "24px" }}>
-              ✓ Õige koht saavutatud!
+              ✓ {t("successTitle")}
             </p>
-            <p>Edukas ühendus.</p>
+            <p>{t("success")}</p>
             <button
               onClick={() => setOlek("algus")}
               style={smallButtonStyle}
             >
-              Alusta uuesti
+              {t("restart")}
             </button>
           </div>
         )}
@@ -126,14 +121,14 @@ function Home() {
         {olek === "viga" && (
           <div style={{ color: "red" }}>
             <p style={{ fontSize: "24px" }}>
-              ⚠️ Error 200 - Ei tööta!
+              ⚠️ {t("error")}
             </p>
-            <p>Suunan automaatselt tagasi algusesse...</p>
+            <p>{t("returning")}</p>
             <button
               onClick={() => setOlek("algus")}
               style={deleteButtonStyle}
             >
-              Mine kohe tagasi
+              {t("back")}
             </button>
           </div>
         )}
@@ -141,6 +136,7 @@ function Home() {
     </div>
   );
 }
+
 
 // ------------------------------------
 // 2. MEIE
@@ -403,18 +399,31 @@ function About() {
 // ------------------------------------
 // 3. PEAMINE APP
 // ------------------------------------
+
 export default function App() {
+  const { t, i18n } = useTranslation();
+
   return (
     <Router>
       <div style={appContainerStyle}>
         <nav style={navStyle}>
           <Link to="/" style={linkStyle}>
-            Avaleht
+            {t("home")}
           </Link>
 
           <Link to="/meist" style={linkStyle}>
-            Meist
+            {t("about")}
           </Link>
+
+          <select
+            value={i18n.language.startsWith("en") ? "en" : "et"}
+            onChange={(e) => i18n.changeLanguage(e.target.value)}
+            style={{ marginLeft: "15px", padding: "8px" }}
+            aria-label={t("language")}
+          >
+            <option value="et">Eesti</option>
+            <option value="en">English</option>
+          </select>
         </nav>
 
         <main style={contentStyle}>
@@ -427,6 +436,7 @@ export default function App() {
     </Router>
   );
 }
+
 
 // ------------------------------------
 // 4. STIILID
