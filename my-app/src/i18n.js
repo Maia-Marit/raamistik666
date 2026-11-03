@@ -99,11 +99,15 @@ const resources = {
 
 i18n.use(initReactI18next).init({
   resources,
-  lng: "et",
+  lng: localStorage.getItem("react-keel") || "et",
   fallbackLng: "et",
   interpolation: {
     escapeValue: false
   }
+});
+
+i18n.on("languageChanged", (language) => {
+  localStorage.setItem("react-keel", language);
 });
 
 export default i18n;
